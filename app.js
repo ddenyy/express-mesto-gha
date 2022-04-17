@@ -2,16 +2,23 @@ const express = require('express');
 const mongoose = require('mongoose');
 const routersUser = require('./routes/userRoute');
 const routersCard = require('./routes/cardRoute');
-// Слушаем 3000 порт
+
 const { PORT = 3000 } = process.env;
+const { ERROR_NOT_FOUND } = require('./constants');
 
 const app = express();
+
+async function main() {
+  try {
+    await mongoose.connect('mongodb://localhost:27017/mestodb');
+  } catch (err) {
+    console.log(err);
+  }
+}
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
 });
-
-mongoose.connect('mongodb://localhost:27017/mestodb');
 
 app.use(express.json());
 
@@ -25,3 +32,9 @@ app.use((req, res, next) => {
 app.use(routersUser);
 
 app.use(routersCard);
+
+app.use('*', (req, res) => {
+  res.status(ERROR_NOT_FOUND).send({ message: `такой страницы ${req.baseUrl} нет` });
+});
+
+main();
