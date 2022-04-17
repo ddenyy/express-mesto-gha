@@ -14,7 +14,12 @@ module.exports.getUser = (req, res) => {
 // get запрос на конкретного пользователя по _id
 module.exports.getUserById = (req, res) => {
   User.findById(req.params.userId)
-    .then((user) => res.status(200).send({ data: user }))
+    .then((user) => {
+      if (!user) {
+        res.status(ERROR_NOT_FOUND).send({message: 'пользователь с таким id не найден'})
+      }
+      res.status(200).send({ data: user })
+    })
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(ERROR_BAD_REQUEST).send({ message: 'Невалидный id пользователя' });
