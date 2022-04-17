@@ -17,7 +17,7 @@ module.exports.removeCardById = (req, res) => {
       if (!card) {
         res.status(ERROR_NOT_FOUND).send({ message: 'Карточка с таким id не найдена' });
       }
-      res.send({ data: card });
+      res.status(200).send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -32,10 +32,7 @@ module.exports.createCard = (req, res) => {
   const owner = req.user._id;
 
   Card.create({ name, link, owner })
-    .then((card) => res.status(200).send({
-      name: card.name,
-      link: card.link,
-    }))
+    .then((card) => res.status(200).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(ERROR_BAD_REQUEST).send({ message: 'переданы невалидные данные карточки' });
@@ -69,7 +66,7 @@ module.exports.dislikeCard = (req, res) => {
       if (!card) {
         res.status(ERROR_NOT_FOUND).send({ message: 'Передан несуществующий id карточки.' });
       } else {
-        res.send({ card });
+        res.status(200).send({ card });
       }
     })
     .catch((err) => {

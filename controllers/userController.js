@@ -48,11 +48,17 @@ module.exports.updateUserData = (req, res) => {
   User.findByIdAndUpdate(userId, { name, about }, { new: true })
     .then((user) => {
       if (user) {
-        return res.status(200).send({ data: user });
+        res.status(200).send({ data: user });
       }
-      return res.status(ERROR_NOT_FOUND).send({ message: 'пользователь с данным id не найден' });
+      res.status(ERROR_NOT_FOUND).send({ message: 'пользователь с данным id не найден' });
     })
-    .catch((err) => res.status(ERROR_INTERNAL).send({ message: err.message }));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(ERROR_BAD_REQUEST).send({ message: 'Переданы некорректные данные при обновлении профиля' });
+      } else {
+        res.status(ERROR_INTERNAL).send({ message: err.message });
+      }
+    });
 };
 
 module.exports.updateUserAvatar = (req, res) => {
