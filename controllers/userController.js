@@ -47,10 +47,10 @@ module.exports.updateUserData = (req, res) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(userId, { name, about }, { new: true })
     .then((user) => {
-      if (user) {
-        res.status(200).send({ data: user });
+      if (!user) {
+        res.status(ERROR_NOT_FOUND).send({ message: 'пользователь с данным id не найден' });
       }
-      res.status(ERROR_NOT_FOUND).send({ message: 'пользователь с данным id не найден' });
+      res.status(200).send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
