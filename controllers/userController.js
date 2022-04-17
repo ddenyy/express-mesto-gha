@@ -45,12 +45,13 @@ module.exports.createUser = (req, res) => {
 module.exports.updateUserData = (req, res) => {
   const userId = req.user._id;
   const { name, about } = req.body;
-  User.findByIdAndUpdate(userId, { name, about }, { new: true })
+  User.findByIdAndUpdate(userId, { name, about }, { runValidators: true, new: true })
     .then((user) => {
       if (!user) {
         res.status(ERROR_NOT_FOUND).send({ message: 'пользователь с данным id не найден' });
+      } else {
+        res.status(200).send({ data: user });
       }
-      res.status(200).send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
