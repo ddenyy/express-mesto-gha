@@ -16,14 +16,16 @@ module.exports.removeCardById = (req, res) => {
     .then((card) => {
       if (!card) {
         res.status(ERROR_NOT_FOUND).send({ message: 'Карточка с таким id не найдена' });
+      } else {
+        res.status(200).send({ data: card });
       }
-      res.status(200).send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(ERROR_BAD_REQUEST).send({ message: 'переданы невалидные данные карточки' });
+        res.status(ERROR_BAD_REQUEST).send({ message: 'переданы невалидные данные карточки' });
+      } else {
+        res.status(ERROR_INTERNAL).send({ message: err.message });
       }
-      return res.status(ERROR_INTERNAL).send({ message: err.message });
     });
 };
 

@@ -17,14 +17,15 @@ module.exports.getUserById = (req, res) => {
     .then((user) => {
       if (!user) {
         res.status(ERROR_NOT_FOUND).send({ message: 'пользователь с таким id не найден' });
+      } else {
+        res.status(200).send({ data: user });
       }
-      res.status(200).send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(ERROR_BAD_REQUEST).send({ message: 'Невалидный id пользователя' });
-      } else if (err.name === 'NotFound') {
-        res.status(ERROR_INTERNAL).send({ message: 'На сервере произошла ошибка' });
+      } else {
+        res.status(ERROR_INTERNAL).send({ message: err.message });
       }
     });
 };
@@ -37,8 +38,9 @@ module.exports.createUser = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(ERROR_BAD_REQUEST).send({ message: 'Переданы Невалидные данные пользователя при создании' });
+      } else {
+        res.status(ERROR_INTERNAL).send({ message: err.message });
       }
-      res.status(ERROR_INTERNAL).send({ err: err.message });
     });
 };
 
@@ -67,10 +69,11 @@ module.exports.updateUserAvatar = (req, res) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(userId, { avatar }, { runValidators: true, new: true })
     .then((user) => {
-      if (user) {
-        return res.status(200).send({ data: user });
+      if (!user) {
+        res.status(ERROR_NOT_FOUND).send({ message: 'пользователь с данным id не найден' });
+      } else {
+        res.status(200).send({ data: user });
       }
-      return res.status(ERROR_NOT_FOUND).send({ message: 'пользователь с данным id не найден' });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {

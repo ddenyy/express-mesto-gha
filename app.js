@@ -8,17 +8,9 @@ const { ERROR_NOT_FOUND } = require('./constants');
 
 const app = express();
 
-async function main() {
-  try {
-    await mongoose.connect('mongodb://localhost:27017/mestodb');
-  } catch (err) {
-    console.log(err);
-  }
-}
+mongoose.connect('mongodb://localhost:27017/mestodb');
 
-app.listen(PORT, () => {
-  console.log(`App listening on port ${PORT}`);
-});
+app.listen(PORT);
 
 app.use(express.json());
 
@@ -36,5 +28,3 @@ app.use(routersCard);
 app.use('*', (req, res) => {
   res.status(ERROR_NOT_FOUND).send({ message: `такой страницы ${req.baseUrl} нет` });
 });
-
-main();
