@@ -2,29 +2,43 @@ const express = require('express');
 const mongoose = require('mongoose');
 const routersUser = require('./routes/userRoute');
 const routersCard = require('./routes/cardRoute');
-
+const {login, createUser} = require('./controllers/userController');
 const { PORT = 3000 } = process.env;
-const { ERROR_NOT_FOUND } = require('./constants');
-
+const auth = require('./middlewares/auth');
 const app = express();
-
+const NotFoundError = require('./errors/NotFoundError');
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const errorHandler = require('./middlewares/errorHandler');
+const { errors } = require('celebrate');
+const {
+  signUpValidation,
+  signInValidation,
+} = require('./middlewares/validations');
+// подключение к бд
 mongoose.connect('mongodb://localhost:27017/mestodb');
 
 app.listen(PORT);
+// подключаем обработку приходящих данных
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+// подключаем обработку куки, все куки лежат в req.cookie
+app.use(cookieParser());
 
-app.use(express.json());
+app.post('/signin',signInValidation, login);
+app.post('/signup',signUpValidation, createUser);
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '6259c5963ba250c2f0535983',
-  };
-  next();
-});
-
+// middleware для проверки авторизаци пользователя
+app.use(auth);
+// роуты которым нужна авторизация
 app.use(routersUser);
-
 app.use(routersCard);
 
-app.use('*', (req, res) => {
-  res.status(ERROR_NOT_FOUND).send({ message: `такой страницы ${req.baseUrl} нет` });
+
+app.use('*', (req, res, next) => {
+  next(new NotFoundError('Страница не найдена'));
 });
+
+app.use(errors());
+app.use(errorHandler);
+

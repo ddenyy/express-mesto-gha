@@ -1,35 +1,39 @@
 const Card = require('../models/card');
-const {
-  ERROR_BAD_REQUEST,
-  ERROR_NOT_FOUND,
-  ERROR_INTERNAL,
-} = require('../constants');
+const BadRequestError = require('../errors/BadRequestError');
+const NotFoundError = require('../errors/NotFoundError');
+const ForbiddenError = require('../errors/ForbiddenError');
 // get запрос на все карточки
-module.exports.getCard = (req, res) => {
+module.exports.getCard = (req, res, next) => {
   Card.find({})
     .then((cards) => res.status(200).send({ data: cards }))
-    .catch((err) => res.status(ERROR_INTERNAL).send({ message: err.message }));
+    .catch(next)
 };
 
-module.exports.removeCardById = (req, res) => {
-  Card.findByIdAndRemove(req.params.cardId)
+module.exports.removeCardById = (req, res, next) => {
+  const {cardId} = req.params;
+  const {userId} = req.user;
+
+  Card.findByIdAndRemove(cardId)
     .then((card) => {
       if (!card) {
-        res.status(ERROR_NOT_FOUND).send({ message: 'Карточка с таким id не найдена' });
-      } else {
-        res.status(200).send({ data: card });
+        return next(new NotFoundError('карточка с таким id не найдена'));
       }
+      if (card.owner.valueOf() !== userId) {
+        return next(new ForbiddenError('нельзя удалить чужую карточку'))
+      }
+        return res.status(200).send({ data: card });
+
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ERROR_BAD_REQUEST).send({ message: 'переданы невалидные данные карточки' });
+        return next(new BadRequestError('переданы невалидные данные карточки'));
       } else {
-        res.status(ERROR_INTERNAL).send({ message: err.message });
+        return next(err);
       }
     });
 };
 
-module.exports.createCard = (req, res) => {
+module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
   const owner = req.user._id;
 
@@ -37,45 +41,45 @@ module.exports.createCard = (req, res) => {
     .then((card) => res.status(200).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(ERROR_BAD_REQUEST).send({ message: 'переданы невалидные данные карточки' });
+        return next(new BadRequestError('переданы невалидные данные карточки'));
       } else {
-        res.status(ERROR_INTERNAL).send({ message: err.message });
+        return next(err);
       }
     });
 };
 
-module.exports.likeCard = (req, res) => {
+module.exports.likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
     .then((card) => {
       if (!card) {
-        res.status(ERROR_NOT_FOUND).send({ message: 'Карточка с таким id не найдена' });
+        return next(new NotFoundError('карточка с таким id не найдена'));
       } else {
-        res.status(200).send({ card });
+        return res.status(200).send({ card });
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ERROR_BAD_REQUEST).send({ message: 'переданы невалидные данные карточки' });
+        return next(new BadRequestError('переданы невалидные данные карточки'));
       } else {
-        res.status(ERROR_INTERNAL).send({ message: err.message });
+        return next(err);
       }
     });
 };
 
-module.exports.dislikeCard = (req, res) => {
+module.exports.dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } }, { new: true })
     .then((card) => {
       if (!card) {
-        res.status(ERROR_NOT_FOUND).send({ message: 'Передан несуществующий id карточки.' });
+        return next(new NotFoundError('карточка с таким id не найдена'));
       } else {
         res.status(200).send({ card });
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ERROR_BAD_REQUEST).send({ message: 'переданы невалидные данные карточки' });
+        return next(new BadRequestError('переданы невалидные данные карточки'));
       } else {
-        res.status(ERROR_INTERNAL).send({ message: err.message });
+        return next(err);
       }
     });
 };
