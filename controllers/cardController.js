@@ -6,12 +6,12 @@ const ForbiddenError = require('../errors/ForbiddenError');
 module.exports.getCard = (req, res, next) => {
   Card.find({})
     .then((cards) => res.status(200).send({ data: cards }))
-    .catch(next)
+    .catch(next);
 };
 
 module.exports.removeCardById = (req, res, next) => {
-  const {cardId} = req.params;
-  const {userId} = req.user;
+  const { cardId } = req.params;
+  const { userId } = req.user;
 
   Card.findByIdAndRemove(cardId)
     .then((card) => {
@@ -19,17 +19,15 @@ module.exports.removeCardById = (req, res, next) => {
         return next(new NotFoundError('карточка с таким id не найдена'));
       }
       if (card.owner.valueOf() !== userId) {
-        return next(new ForbiddenError('нельзя удалить чужую карточку'))
+        return next(new ForbiddenError('нельзя удалить чужую карточку'));
       }
-        return res.status(200).send({ data: card });
-
+      return res.status(200).send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return next(new BadRequestError('переданы невалидные данные карточки'));
-      } else {
-        return next(err);
+        next(new BadRequestError('переданы невалидные данные карточки'));
       }
+      return next(err);
     });
 };
 
@@ -42,9 +40,8 @@ module.exports.createCard = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return next(new BadRequestError('переданы невалидные данные карточки'));
-      } else {
-        return next(err);
       }
+      return next(err);
     });
 };
 
@@ -53,16 +50,14 @@ module.exports.likeCard = (req, res, next) => {
     .then((card) => {
       if (!card) {
         return next(new NotFoundError('карточка с таким id не найдена'));
-      } else {
-        return res.status(200).send({ card });
       }
+      return res.status(200).send({ card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         return next(new BadRequestError('переданы невалидные данные карточки'));
-      } else {
-        return next(err);
       }
+      return next(err);
     });
 };
 
@@ -71,15 +66,13 @@ module.exports.dislikeCard = (req, res, next) => {
     .then((card) => {
       if (!card) {
         return next(new NotFoundError('карточка с таким id не найдена'));
-      } else {
-        res.status(200).send({ card });
       }
+      return res.status(200).send({ card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         return next(new BadRequestError('переданы невалидные данные карточки'));
-      } else {
-        return next(err);
       }
+      return next(err);
     });
 };
