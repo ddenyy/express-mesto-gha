@@ -21,8 +21,7 @@ mongoose.connect('mongodb://localhost:27017/mestodb');
 
 app.listen(PORT);
 // подключаем обработку приходящих данных
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
 // подключаем обработку куки, все куки лежат в req.cookie
 app.use(cookieParser());
 
