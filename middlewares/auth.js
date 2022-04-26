@@ -6,7 +6,7 @@ const auth = (req, res, next) => {
   const token = req.cookies.jwt;
   // убеждаемся, что токен в куках есть
   if (!token) {
-    throw new UnauthorizedError('Нужна авторизация');
+    return next(new UnauthorizedError('Нужна авторизация'));
   }
   let payload;
   try {
