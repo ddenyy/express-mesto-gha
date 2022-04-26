@@ -14,12 +14,12 @@ const {
   updateAvatarValidation,
 } = require('../middlewares/validations');
 
+// получить информацию о текущем пользователе
+router.get('/users/me', getCurrentUser);
 // получить всех пользователей
 router.get('/users', getUser);
 // получить конкретного пользователя по Id
 router.get('/users/:userId', userIdValidation, getUserById);
-// получить информацию о текущем пользователе
-router.get('/users/me', getCurrentUser);
 // создать пользователя
 router.post('/users', createUser);
 // обновить информацию о текущем пользователе

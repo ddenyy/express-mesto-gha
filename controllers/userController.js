@@ -100,13 +100,13 @@ module.exports.updateUserAvatar = (req, res, next) => {
 };
 
 module.exports.getCurrentUser = (req, res, next) => {
-  const id = req.user._id;
-  User.findById(id)
+  const { _id } = req.user;
+  User.findById(_id)
     .then((user) => {
       if (!user) {
         return next(new NotFoundError('пользователь не найден'));
       }
-      return res.status(200).send(user);
+      return res.status(200).send({ data: user });
     })
     .catch(next);
 };
