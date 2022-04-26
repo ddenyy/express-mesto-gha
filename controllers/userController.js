@@ -118,11 +118,7 @@ module.exports.login = (req, res, next) => {
   User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
-      res.cookie('jwt', token, {
-        httpOnly: true,
-        maxAge: 604800000,
-      });
-      res.send({ message: 'токен находится в cookie' });
+      res.send({ token });
     })
     .catch(() => next(new UnauthorizedError('Неправильная почта или пароль')));
 };
