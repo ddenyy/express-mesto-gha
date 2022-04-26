@@ -11,14 +11,14 @@ module.exports.getCard = (req, res, next) => {
 
 module.exports.removeCardById = (req, res, next) => {
   const { cardId } = req.params;
-  const { userId } = req.user;
+  const { _id } = req.user;
 
   Card.findByIdAndRemove(cardId)
     .then((card) => {
       if (!card) {
         return next(new NotFoundError('карточка с таким id не найдена'));
       }
-      if (card.owner.valueOf() !== userId) {
+      if (card.owner.valueOf() !== _id) {
         return next(new ForbiddenError('нельзя удалить чужую карточку'));
       }
       return res.status(200).send({ data: card });

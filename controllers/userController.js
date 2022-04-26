@@ -54,7 +54,6 @@ module.exports.createUser = (req, res, next) => {
       })))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        console.log(err);
         return next(new BadRequestError('Переданы некорректные данные'));
       }
       if (err.code === 11000) {
