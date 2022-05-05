@@ -12,6 +12,7 @@ const {
   signUpValidation,
   signInValidation,
 } = require('./middlewares/validations');
+const corsHandler = require('./middlewares/corsHeaders');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -23,7 +24,8 @@ app.listen(PORT);
 app.use(express.json());
 // подключаем обработку куки, все куки лежат в req.cookie
 app.use(cookieParser());
-
+// подключаем валидацию запросов чтоб проходил проверку CORS
+app.use(corsHandler);
 app.post('/signin', signInValidation, login);
 app.post('/signup', signUpValidation, createUser);
 
