@@ -1,12 +1,15 @@
 // Массив доменов, с которых разрешены кросс-доменные запросы
 const allowedCors = [
   'https://mesto.frontend.nomoredomains.work',
+  'https://mesto.frontend.nomoredomains.work',
   'http://praktikum.tk',
-  'localhost:3000'
+  'localhost:3000',
+  'http://localhost:3000'
 ];
 
-const corsHandler = (function (req, res, next) {
+const corsHandler = (req, res, next) => {
   const { origin } = req.headers; // Сохраняем источник запроса в переменную origin
+  console.log(req.headers);
   // проверяем, что источник запроса есть среди разрешённых
   if (allowedCors.includes(origin)) {
     // устанавливаем заголовок, который разрешает браузеру запросы с этого источника
@@ -26,8 +29,8 @@ const corsHandler = (function (req, res, next) {
     return res.end();
   }
 
-  next();
-});
+  return next();
+};
 
 module.exports = corsHandler;
 
