@@ -4,12 +4,11 @@ const allowedCors = [
   'https://mesto.frontend.nomoredomains.work',
   'http://praktikum.tk',
   'localhost:3000',
-  'http://localhost:3000'
+  'http://localhost:3000',
 ];
 
 const corsHandler = (req, res, next) => {
   const { origin } = req.headers; // Сохраняем источник запроса в переменную origin
-  console.log(req.headers);
   // проверяем, что источник запроса есть среди разрешённых
   if (allowedCors.includes(origin)) {
     // устанавливаем заголовок, который разрешает браузеру запросы с этого источника
@@ -18,7 +17,7 @@ const corsHandler = (req, res, next) => {
   const { method } = req; // Сохраняем тип запроса (HTTP-метод) в соответствующую переменную
 
   // Значение для заголовка Access-Control-Allow-Methods по умолчанию (разрешены все типы запросов)
-  const DEFAULT_ALLOWED_METHODS = "GET,HEAD,PUT,PATCH,POST,DELETE";
+  const DEFAULT_ALLOWED_METHODS = 'GET,HEAD,PUT,PATCH,POST,DELETE';
 
   const requestHeaders = req.headers['access-control-request-headers'];
   // Если это предварительный запрос, добавляем нужные заголовки
@@ -33,5 +32,3 @@ const corsHandler = (req, res, next) => {
 };
 
 module.exports = corsHandler;
-
-

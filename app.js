@@ -1,4 +1,6 @@
 require('dotenv').config();
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 const express = require('express');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
@@ -15,8 +17,6 @@ const {
 } = require('./middlewares/validations');
 const cors = require('./middlewares/corsHeaders');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-const rateLimit = require('express-rate-limit');
-const helmet = require('helmet');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -40,7 +40,7 @@ app.use(cookieParser());
 app.use(cors);
 // настраиваем заголовки
 app.use(helmet());
-//подключаем логгер запросов
+// подключаем логгер запросов
 app.use(requestLogger);
 app.post('/signin', signInValidation, login);
 app.post('/signup', signUpValidation, createUser);
@@ -50,7 +50,7 @@ app.use(auth);
 // роуты которым нужна авторизация
 app.use(routersUser);
 app.use(routersCard);
-//подключаем логгер ошибок
+// подключаем логгер ошибок
 app.use(errorLogger);
 
 app.use('*', (req, res, next) => {
